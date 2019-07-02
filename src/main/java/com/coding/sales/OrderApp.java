@@ -57,15 +57,18 @@ public class OrderApp {
 		String memberNo = command.getMemberId();
 		Member member = members.get(memberNo);
 		String memberName = member.getMemberName();
-		String oldMemberType = member.getCardInfo().getMemberType();
+		
+		CardInfo memberCardInfo = member.getCardInfo();
+		String oldMemberType = memberCardInfo.getMemberType();
 
 		// 积分计算规则
-		int memberPointsIncreased = 9860;
-		int memberPoints = 19720;
-		CardCreateFactory cardCreateFactory = new CardCreateFactory();
+		int memberPointsIncreased = command.getPayments().get(0).getAmount().intValue();
+		int memberPoints = member.getMemberPoints() + memberPointsIncreased * memberCardInfo.getPointMutiple().intValue();
 		
-		CardInfo cardInfo = cardCreateFactory.createCard(memberPoints);
-		String newMemberType = cardInfo.getMemberType();
+		CardCreateFactory cardCreateFactory = new CardCreateFactory();
+		CardInfo memberCardInfoNew = cardCreateFactory.createCard(memberPoints);
+		String newMemberType = memberCardInfoNew.getMemberType();
+		member.setCardInfo(memberCardInfoNew);
 		
 		List<OrderItemRepresentation> orderItems = generateOrderItemRepresentation(command.getItems());
 		BigDecimal totalPrice = new BigDecimal("10624.00");
