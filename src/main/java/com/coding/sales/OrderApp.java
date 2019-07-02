@@ -5,13 +5,18 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.activity.ActivityCompletedException;
+
+import com.coding.sales.enums.ActicityEnums;
 import com.coding.sales.init.Members;
 import com.coding.sales.init.PreciousMetals;
 import com.coding.sales.input.OrderCommand;
 import com.coding.sales.input.OrderItemCommand;
+import com.coding.sales.input.PaymentCommand;
 import com.coding.sales.interfaces.impl.CardCreateFactory;
 import com.coding.sales.output.DiscountItemRepresentation;
 import com.coding.sales.output.OrderItemRepresentation;
@@ -57,23 +62,28 @@ public class OrderApp {
 		String memberNo = command.getMemberId();
 		Member member = members.get(memberNo);
 		String memberName = member.getMemberName();
-		
+
 		CardInfo memberCardInfo = member.getCardInfo();
 		String oldMemberType = memberCardInfo.getMemberType();
 
 		// 积分计算规则
 		int memberPointsIncreased = command.getPayments().get(0).getAmount().intValue();
-		int memberPoints = member.getMemberPoints() + memberPointsIncreased * memberCardInfo.getPointMutiple().intValue();
-		
+		int memberPoints = member.getMemberPoints()
+				+ memberPointsIncreased * memberCardInfo.getPointMutiple().intValue();
+
 		CardCreateFactory cardCreateFactory = new CardCreateFactory();
 		CardInfo memberCardInfoNew = cardCreateFactory.createCard(memberPoints);
 		String newMemberType = memberCardInfoNew.getMemberType();
 		member.setCardInfo(memberCardInfoNew);
-		
+
 		List<OrderItemRepresentation> orderItems = generateOrderItemRepresentation(command.getItems());
-		BigDecimal totalPrice =totalAmount(orderItems);
-		List<DiscountItemRepresentation> discounts = generateDiscountItemRepresentation();
-		BigDecimal totalDiscountPrice = new BigDecimal("764.00");
+		BigDecimal totalPrice = totalAmount(orderItems);
+
+		List<DiscountItemRepresentation> discounts = computeAmount(command.getItems(), command.getPayments(),
+				command.getDiscounts());
+		// List<DiscountItemRepresentation> discounts =
+		// generateDiscountItemRepresentation();
+		BigDecimal totalDiscountPrice = discountTotalAmount(discounts);
 		BigDecimal receivables = new BigDecimal("9860.00");
 		List<PaymentRepresentation> payments = generatePaymentRepresentation();
 		List<String> discountCards = command.getDiscounts();
@@ -83,7 +93,7 @@ public class OrderApp {
 				payments, discountCards);
 
 		return result;
-    }
+	}
 
 	private Date formatDate(String time) {
 		Date createTime = null;
@@ -103,7 +113,7 @@ public class OrderApp {
 		return payments;
 	}
 
-	//处理规则
+	/*// 处理规则
 	private List<DiscountItemRepresentation> generateDiscountItemRepresentation() {
 		List<DiscountItemRepresentation> discounts = new ArrayList<DiscountItemRepresentation>();
 
@@ -114,7 +124,7 @@ public class OrderApp {
 		discounts.add(discount1);
 		discounts.add(discount2);
 		return discounts;
-	}
+	}*/
 
 	private List<OrderItemRepresentation> generateOrderItemRepresentation(List<OrderItemCommand> items) {
 
@@ -133,6 +143,7 @@ public class OrderApp {
 
 		return orderItems;
 	}
+
 	/**
 	 * 计算总金额
 	 * 
@@ -144,8 +155,122 @@ public class OrderApp {
 		for (OrderItemRepresentation orderItemRepresentation : list) {
 			totalAmount = orderItemRepresentation.getSubTotal().add(totalAmount);
 		}
-
 		return totalAmount;
+	}
 
+	// 计算活动金额
+	private List<DiscountItemRepresentation> computeAmount(List<OrderItemCommand> items, List<PaymentCommand> payments,
+			List<String> discounts) {
+
+		List<DiscountItemRepresentation> DiscountItemRepresentationList = new ArrayList<DiscountItemRepresentation>();
+
+		for (OrderItemCommand orderItemCommand : items) {
+
+			PreciousMetal preciousMetal = PreciousMetals.getPreciousMetals().get(orderItemCommand.getProduct());
+			// 获取当前商品的单价
+			BigDecimal price = preciousMetal.getPrice();
+			// 获取活动类型
+			List<String> activityList = preciousMetal.getActicity();
+			// 代金券
+			String voucher = preciousMetal.getVoucher();
+
+			// BigDecimal activityAmount = BigDecimal.ZERO;
+			// 当前商品的数量
+			BigDecimal goodsAmount = orderItemCommand.getAmount();
+			// 计算该商品的总价
+			BigDecimal goodsTotalAmount = orderItemCommand.getAmount().multiply(price);
+			// 如果这个商品有活动
+			BigDecimal discountOfactivity = BigDecimal.ZERO;
+			if (!activityList.isEmpty()) {
+				// 计算商品折扣价
+				for (String activityType : activityList) {
+					if (ActicityEnums.activity_1000.toString().equals(activityType)) {
+						BigDecimal discount_1000 = new BigDecimal(
+								goodsTotalAmount.divide(new BigDecimal("1000")).intValue() * 10);
+						if (discountOfactivity.compareTo(discount_1000) == -1) {
+							discountOfactivity = discount_1000;
+						}
+					}
+					if (ActicityEnums.activity_2000.toString().equals(activityType)) {
+						BigDecimal discount_2000 = new BigDecimal(
+								goodsTotalAmount.divide(new BigDecimal("2000")).intValue() * 30);
+						if (discountOfactivity.compareTo(discount_2000) == -1) {
+							discountOfactivity = discount_2000;
+						}
+					}
+
+					if (ActicityEnums.activity_3000.toString().equals(activityType)) {
+						BigDecimal bg = goodsTotalAmount.divideToIntegralValue(new BigDecimal("3000"));
+						BigDecimal discount_3000 = new BigDecimal(bg.intValue() * 350);
+						if (discountOfactivity.compareTo(discount_3000) == -1) {
+							discountOfactivity = discount_3000;
+						}
+					}
+
+					if (ActicityEnums.activity_3_half.toString().equals(activityType)) {
+						if (goodsAmount.compareTo(new BigDecimal("3")) >= 0) {
+							BigDecimal discount_activity_3_half = price.multiply(new BigDecimal(0.5));
+							if (discountOfactivity.compareTo(discount_activity_3_half) == -1) {
+								discountOfactivity = discount_activity_3_half;
+							}
+						}
+
+					}
+
+					if (ActicityEnums.activity_3_send_one.toString().equals(activityType)) {
+						if (goodsAmount.compareTo(new BigDecimal("4")) >= 0) {
+							if (discountOfactivity.compareTo(price) == -1) {
+								discountOfactivity = price;
+							}
+						}
+					}
+					// priceMap.put("discount", discountOfactivity);
+				}
+
+			}
+
+			// 如果代金券不为空
+			BigDecimal discount = BigDecimal.ZERO;
+			if (!discounts.isEmpty() && voucher != null) {
+				for (String discountVor : discounts) {
+					if (ActicityEnums.voucher_9.toString().equals(voucher) && "9折券".equals(discountVor)) {
+						BigDecimal discount_voucher_9 = goodsTotalAmount.multiply(new BigDecimal(0.1));
+						if (discount.compareTo(discount_voucher_9) == -1) {
+							discount = discount_voucher_9;
+						}
+					}
+
+					if (ActicityEnums.voucher_95.toString().equals(voucher) && "95折券".equals(discountVor)) {
+						BigDecimal discount_voucher_95 = goodsTotalAmount.multiply(new BigDecimal(0.05));
+						if (discount.compareTo(discount_voucher_95) == -1) {
+							discount = discount_voucher_95;
+						}
+					}
+				}
+			}
+
+			if (discountOfactivity.compareTo(discount) == -1) {
+				discountOfactivity = discount;
+			}
+
+			if (discountOfactivity.compareTo(BigDecimal.ZERO) == 1) {
+				DiscountItemRepresentation discount1 = new DiscountItemRepresentation(orderItemCommand.getProduct(),
+						PreciousMetals.getPreciousMetals().get(orderItemCommand.getProduct()).getProductName(),
+						discountOfactivity);
+				DiscountItemRepresentationList.add(discount1);
+			}
+		}
+		return DiscountItemRepresentationList;
+	}
+	
+	private BigDecimal discountTotalAmount ( List<DiscountItemRepresentation> list){
+		BigDecimal discountTotalAmount= BigDecimal.ZERO;
+		for (DiscountItemRepresentation discountItemRepresentation : list) {
+			discountTotalAmount= 	discountItemRepresentation.getDiscount().add(discountTotalAmount);
+		}
+		return discountTotalAmount;
+		
+		
+		
 	}
 }
