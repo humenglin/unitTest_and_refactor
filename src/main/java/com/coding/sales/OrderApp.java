@@ -14,7 +14,11 @@ import com.coding.sales.init.PreciousMetals;
 import com.coding.sales.input.OrderCommand;
 import com.coding.sales.input.OrderItemCommand;
 import com.coding.sales.input.PaymentCommand;
+import com.coding.sales.interfaces.ActivityRuleInteface;
+import com.coding.sales.interfaces.VoucherRuleInteface;
+import com.coding.sales.interfaces.impl.ActivityRuleImpl;
 import com.coding.sales.interfaces.impl.CardCreateFactory;
+import com.coding.sales.interfaces.impl.VoucherRuleImpl;
 import com.coding.sales.output.DiscountItemRepresentation;
 import com.coding.sales.output.OrderItemRepresentation;
 import com.coding.sales.output.OrderRepresentation;
@@ -179,71 +183,21 @@ public class OrderApp {
 			BigDecimal goodsTotalAmount = orderItemCommand.getAmount().multiply(price);
 			// 如果这个商品有活动
 			BigDecimal discountOfactivity = BigDecimal.ZERO;
+			ActivityRuleInteface activityRule = new ActivityRuleImpl();
 			if (!activityList.isEmpty()) {
 				// 计算商品折扣价
 				for (String activityType : activityList) {
-					if (ActicityEnums.activity_1000.toString().equals(activityType)) {
-						BigDecimal discount_1000 = new BigDecimal(
-								goodsTotalAmount.divide(new BigDecimal("1000")).intValue() * 10);
-						if (discountOfactivity.compareTo(discount_1000) == -1) {
-							discountOfactivity = discount_1000;
-						}
-					}
-					if (ActicityEnums.activity_2000.toString().equals(activityType)) {
-						BigDecimal discount_2000 = new BigDecimal(
-								goodsTotalAmount.divide(new BigDecimal("2000")).intValue() * 30);
-						if (discountOfactivity.compareTo(discount_2000) == -1) {
-							discountOfactivity = discount_2000;
-						}
-					}
-
-					if (ActicityEnums.activity_3000.toString().equals(activityType)) {
-						BigDecimal bg = goodsTotalAmount.divideToIntegralValue(new BigDecimal("3000"));
-						BigDecimal discount_3000 = new BigDecimal(bg.intValue() * 350);
-						if (discountOfactivity.compareTo(discount_3000) == -1) {
-							discountOfactivity = discount_3000;
-						}
-					}
-
-					if (ActicityEnums.activity_3_half.toString().equals(activityType)) {
-						if (goodsAmount.compareTo(new BigDecimal("3")) >= 0) {
-							BigDecimal discount_activity_3_half = price.multiply(new BigDecimal(0.5));
-							if (discountOfactivity.compareTo(discount_activity_3_half) == -1) {
-								discountOfactivity = discount_activity_3_half;
-							}
-						}
-
-					}
-
-					if (ActicityEnums.activity_3_send_one.toString().equals(activityType)) {
-						if (goodsAmount.compareTo(new BigDecimal("4")) >= 0) {
-							if (discountOfactivity.compareTo(price) == -1) {
-								discountOfactivity = price;
-							}
-						}
-					}
-					// priceMap.put("discount", discountOfactivity);
+					discountOfactivity = activityRule.activityRule(price, goodsAmount, discountOfactivity, activityType);
 				}
 
 			}
 
 			// 如果代金券不为空
 			BigDecimal discount = BigDecimal.ZERO;
+			VoucherRuleInteface voucherRule = new VoucherRuleImpl();
 			if (!discounts.isEmpty() && voucher != null) {
 				for (String discountVor : discounts) {
-					if (ActicityEnums.voucher_9.toString().equals(voucher) && "9折券".equals(discountVor)) {
-						BigDecimal discount_voucher_9 = goodsTotalAmount.multiply(new BigDecimal(0.1));
-						if (discount.compareTo(discount_voucher_9) == -1) {
-							discount = discount_voucher_9;
-						}
-					}
-
-					if (ActicityEnums.voucher_95.toString().equals(voucher) && "95折券".equals(discountVor)) {
-						BigDecimal discount_voucher_95 = goodsTotalAmount.multiply(new BigDecimal(0.05));
-						if (discount.compareTo(discount_voucher_95) == -1) {
-							discount = discount_voucher_95;
-						}
-					}
+					discount=voucherRule.voucherRule(voucher, discountVor, discount, goodsTotalAmount);
 				}
 			}
 
