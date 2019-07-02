@@ -57,7 +57,7 @@ public class OrderApp {
 		String memberNo = command.getMemberId();
 		Member member = members.get(memberNo);
 		String memberName = member.getMemberName();
-		String oldMemberType = member.getMemberType();
+		String oldMemberType = member.getCardInfo().getMemberType();
 
 		// 积分计算规则
 		int memberPointsIncreased = 9860;

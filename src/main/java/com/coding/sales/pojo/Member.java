@@ -11,23 +11,23 @@ public class Member {
 	
 	private String memberName;
 	
-	private String memberType;
+	private CardInfo cardInfo;
 	
 	private int memberPoints;
 
-	public Member(String memberNo, String memberName, String memberType, int memberPoints) {
+	public Member(String memberNo, String memberName, CardInfo cardInfo, int memberPoints) {
 		this.memberNo = memberNo;
 		this.memberName = memberName;
-		this.memberType = memberType;
+		this.cardInfo = cardInfo;
 		this.memberPoints = memberPoints;
 	}
 
-	public String getMemberType() {
-		return memberType;
+	public CardInfo getCardInfo() {
+		return cardInfo;
 	}
 
-	public void setMemberType(String memberType) {
-		this.memberType = memberType;
+	public void setCardInfo(CardInfo cardInfo) {
+		this.cardInfo = cardInfo;
 	}
 
 	public int getMemberPoints() {
