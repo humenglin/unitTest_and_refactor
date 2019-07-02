@@ -8,13 +8,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.coding.sales.enums.ActicityEnums;
 import com.coding.sales.init.Members;
 import com.coding.sales.init.PreciousMetals;
 import com.coding.sales.input.OrderCommand;
 import com.coding.sales.input.OrderItemCommand;
 import com.coding.sales.input.PaymentCommand;
 import com.coding.sales.interfaces.ActivityRuleInteface;
+import com.coding.sales.interfaces.CardInfoInteface;
 import com.coding.sales.interfaces.VoucherRuleInteface;
 import com.coding.sales.interfaces.impl.ActivityRuleImpl;
 import com.coding.sales.interfaces.impl.CardCreateFactory;
@@ -72,8 +72,9 @@ public class OrderApp {
 		int memberPoints = member.getMemberPoints()
 				+ memberPointsIncreased * memberCardInfo.getPointMutiple().intValue();
 
-		CardCreateFactory cardCreateFactory = new CardCreateFactory();
-		CardInfo memberCardInfoNew = cardCreateFactory.createCard(memberPoints);
+		//根据不同积分返回不同卡种
+		CardInfoInteface cardInfoInteface = new CardCreateFactory();
+		CardInfo memberCardInfoNew = cardInfoInteface.createCard(memberPoints);
 		String newMemberType = memberCardInfoNew.getMemberType();
 		member.setCardInfo(memberCardInfoNew);
 
@@ -115,18 +116,6 @@ public class OrderApp {
 		return payments;
 	}
 
-	/*// 处理规则
-	private List<DiscountItemRepresentation> generateDiscountItemRepresentation() {
-		List<DiscountItemRepresentation> discounts = new ArrayList<DiscountItemRepresentation>();
-
-		DiscountItemRepresentation discount1 = new DiscountItemRepresentation("001002", "2019北京世园会纪念银章大全40g",
-				new BigDecimal("414.00"));
-		DiscountItemRepresentation discount2 = new DiscountItemRepresentation("002003", "中国银象棋12g",
-				new BigDecimal("350.00"));
-		discounts.add(discount1);
-		discounts.add(discount2);
-		return discounts;
-	}*/
 
 	private List<OrderItemRepresentation> generateOrderItemRepresentation(List<OrderItemCommand> items) {
 
@@ -167,7 +156,6 @@ public class OrderApp {
 		List<DiscountItemRepresentation> DiscountItemRepresentationList = new ArrayList<DiscountItemRepresentation>();
 
 		for (OrderItemCommand orderItemCommand : items) {
-
 			PreciousMetal preciousMetal = PreciousMetals.getPreciousMetals().get(orderItemCommand.getProduct());
 			// 获取当前商品的单价
 			BigDecimal price = preciousMetal.getPrice();
@@ -175,8 +163,6 @@ public class OrderApp {
 			List<String> activityList = preciousMetal.getActicity();
 			// 代金券
 			String voucher = preciousMetal.getVoucher();
-
-			// BigDecimal activityAmount = BigDecimal.ZERO;
 			// 当前商品的数量
 			BigDecimal goodsAmount = orderItemCommand.getAmount();
 			// 计算该商品的总价
@@ -191,7 +177,6 @@ public class OrderApp {
 				}
 
 			}
-
 			// 如果代金券不为空
 			BigDecimal discount = BigDecimal.ZERO;
 			VoucherRuleInteface voucherRule = new VoucherRuleImpl();
@@ -200,11 +185,9 @@ public class OrderApp {
 					discount=voucherRule.voucherRule(voucher, discountVor, discount, goodsTotalAmount);
 				}
 			}
-
 			if (discountOfactivity.compareTo(discount) == -1) {
 				discountOfactivity = discount;
 			}
-
 			if (discountOfactivity.compareTo(BigDecimal.ZERO) == 1) {
 				DiscountItemRepresentation discount1 = new DiscountItemRepresentation(orderItemCommand.getProduct(),
 						PreciousMetals.getPreciousMetals().get(orderItemCommand.getProduct()).getProductName(),
@@ -216,9 +199,9 @@ public class OrderApp {
 	}
 	
 	private BigDecimal discountTotalAmount ( List<DiscountItemRepresentation> list){
-		BigDecimal discountTotalAmount= BigDecimal.ZERO;
+		BigDecimal discountTotalAmount = BigDecimal.ZERO;
 		for (DiscountItemRepresentation discountItemRepresentation : list) {
-			discountTotalAmount= 	discountItemRepresentation.getDiscount().add(discountTotalAmount);
+			discountTotalAmount = discountItemRepresentation.getDiscount().add(discountTotalAmount);
 		}
 		return discountTotalAmount;
 		
