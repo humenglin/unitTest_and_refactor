@@ -63,8 +63,10 @@ public class OrderApp {
 		int memberPointsIncreased = 9860;
 		int memberPoints = 19720;
 		CardCreateFactory cardCreateFactory = new CardCreateFactory();
+		
 		CardInfo cardInfo = cardCreateFactory.createCard(memberPoints);
-		String newMemberType = cardInfo.getCardName();
+		String newMemberType = cardInfo.getMemberType();
+		
 		List<OrderItemRepresentation> orderItems = generateOrderItemRepresentation(command.getItems());
 		BigDecimal totalPrice = new BigDecimal("10624.00");
 		List<DiscountItemRepresentation> discounts = generateDiscountItemRepresentation();

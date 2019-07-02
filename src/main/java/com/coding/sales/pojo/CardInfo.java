@@ -8,28 +8,19 @@ import java.math.BigDecimal;
  */
 public class CardInfo {
 	//卡名称
-	private String cardName;
+	private String memberType;
 	//积分倍数
 	private BigDecimal pointMutiple;
 	
-	public CardInfo(String cardName,BigDecimal pointMutiple ) {
-		this.cardName=cardName;
-		this.pointMutiple=pointMutiple;
+	public CardInfo(String memberType, BigDecimal pointMutiple) {
+		this.memberType = memberType;
+		this.pointMutiple = pointMutiple;
 	}
-	
-	public String getCardName() {
-		return cardName;
+	public String getMemberType() {
+		return memberType;
 	}
-	public void setCardName(String cardName) {
-		this.cardName = cardName;
-	}
-
 	public BigDecimal getPointMutiple() {
 		return pointMutiple;
-	}
-
-	public void setPointMutiple(BigDecimal pointMutiple) {
-		this.pointMutiple = pointMutiple;
 	}
 	
 }
