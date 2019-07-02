@@ -6,12 +6,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import com.coding.sales.init.Members;
 import com.coding.sales.input.OrderCommand;
 import com.coding.sales.output.DiscountItemRepresentation;
 import com.coding.sales.output.OrderItemRepresentation;
 import com.coding.sales.output.OrderRepresentation;
 import com.coding.sales.output.PaymentRepresentation;
+import com.coding.sales.pojo.Member;
 
 /**
  * 销售系统的主入口 用于打印销售凭证
@@ -43,17 +46,14 @@ public class OrderApp {
         OrderRepresentation result = null;
         
         String orderId = command.getOrderId(); 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date createTime = null;
-        try {
-			createTime = dateFormat.parse(command.getCreateTime());
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+        Date createTime = formatDate(command.getCreateTime());
         
+        Map<String, Member> members = Members.getMembers();
         String memberNo = command.getMemberId();
-        String memberName = "马丁";
-        String oldMemberType = "普卡";
+        Member member = members.get(memberNo);
+        String memberName = member.getMemberName();
+        String oldMemberType = member.getMemberType();
+        
         String newMemberType = "金卡";
         int memberPointsIncreased = 9860;
         int memberPoints = 19720;
@@ -70,6 +70,17 @@ public class OrderApp {
 
         return result;
     }
+
+	private Date formatDate(String time) {
+		Date createTime = null;
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+			createTime = dateFormat.parse(time);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return createTime;
+	}
 
 	private List<String> generateDiscountCards() {
 		List<String> discountCards = new ArrayList<String>();
