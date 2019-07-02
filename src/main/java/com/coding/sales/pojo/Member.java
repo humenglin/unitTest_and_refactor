@@ -15,6 +15,13 @@ public class Member {
 	
 	private int memberPoints;
 
+	public Member(String memberNo, String memberName, String memberType, int memberPoints) {
+		this.memberNo = memberNo;
+		this.memberName = memberName;
+		this.memberType = memberType;
+		this.memberPoints = memberPoints;
+	}
+
 	public String getMemberType() {
 		return memberType;
 	}
