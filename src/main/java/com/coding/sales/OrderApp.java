@@ -5,11 +5,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.activity.ActivityCompletedException;
 
 import com.coding.sales.enums.ActicityEnums;
 import com.coding.sales.init.Members;
@@ -81,11 +78,10 @@ public class OrderApp {
 
 		List<DiscountItemRepresentation> discounts = computeAmount(command.getItems(), command.getPayments(),
 				command.getDiscounts());
-		// List<DiscountItemRepresentation> discounts =
-		// generateDiscountItemRepresentation();
 		BigDecimal totalDiscountPrice = discountTotalAmount(discounts);
-		BigDecimal receivables = new BigDecimal("9860.00");
-		List<PaymentRepresentation> payments = generatePaymentRepresentation();
+		BigDecimal receivables = command.getPayments().get(0).getAmount();
+		
+		List<PaymentRepresentation> payments = generatePaymentRepresentation(command.getPayments());
 		List<String> discountCards = command.getDiscounts();
 
 		result = new OrderRepresentation(orderId, createTime, memberNo, memberName, oldMemberType, newMemberType,
@@ -106,10 +102,12 @@ public class OrderApp {
 		return createTime;
 	}
 
-	private List<PaymentRepresentation> generatePaymentRepresentation() {
+	private List<PaymentRepresentation> generatePaymentRepresentation(List<PaymentCommand> list) {
 		List<PaymentRepresentation> payments = new ArrayList<PaymentRepresentation>();
-		PaymentRepresentation payment = new PaymentRepresentation("余额支付", new BigDecimal("9860.00"));
-		payments.add(payment);
+		for (PaymentCommand paymentCommand: list) {
+			PaymentRepresentation payment = new PaymentRepresentation(paymentCommand.getType(), paymentCommand.getAmount());
+			payments.add(payment);
+		}
 		return payments;
 	}
 
