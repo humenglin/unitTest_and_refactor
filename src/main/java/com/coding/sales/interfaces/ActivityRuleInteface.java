@@ -8,6 +8,6 @@ import java.math.BigDecimal;
  */
 public interface ActivityRuleInteface {
 
-	public abstract BigDecimal activityRule(BigDecimal price,BigDecimal goodsAmount, BigDecimal discountOfactivity,String activityType) ;
+	public abstract BigDecimal activityRule(BigDecimal price,BigDecimal goodsAmount, BigDecimal discountOfactivity,String activityType) throws Exception  ;
 
 }

@@ -2,6 +2,7 @@ package com.coding.sales.interfaces.impl;
 
 import java.math.BigDecimal;
 
+import com.coding.sales.common.ExceptionConstans;
 import com.coding.sales.enums.ActicityEnums;
 import com.coding.sales.interfaces.ActivityRuleInteface;
 
@@ -17,9 +18,10 @@ public class ActivityRuleImpl implements ActivityRuleInteface {
 	 * @param discountOfactivity 上次的折扣金额
 	 * @param activityType 活动类型
 	 * @return
+	 * @throws Exception 
 	 */
 	@Override
-	public BigDecimal activityRule(BigDecimal price,BigDecimal goodsAmount, BigDecimal discountOfactivity,String activityType) {
+	public BigDecimal activityRule(BigDecimal price,BigDecimal goodsAmount, BigDecimal discountOfactivity,String activityType) throws Exception {
 		BigDecimal goodsTotalAmount = price.multiply(goodsAmount);
 		if (ActicityEnums.activity_1000.toString().equals(activityType)) {
 			BigDecimal discount_1000 = new BigDecimal(
@@ -65,9 +67,8 @@ public class ActivityRuleImpl implements ActivityRuleInteface {
 				}
 			}
 		}
-		// priceMap.put("discount", discountOfactivity);
 		
-		return null;
+		throw new Exception(ExceptionConstans.ACTIVITY_NOT_EXIT);
 	}
 
 }

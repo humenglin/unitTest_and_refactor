@@ -32,7 +32,7 @@ import com.coding.sales.pojo.PreciousMetal;
  */
 public class OrderApp {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		if (args.length != 2) {
 			throw new IllegalArgumentException("参数不正确。参数1为销售订单的JSON文件名，参数2为待打印销售凭证的文本文件名.");
 		}
@@ -46,14 +46,14 @@ public class OrderApp {
 		FileUtils.writeToFile(result, txtFileName);
 	}
 
-	public String checkout(String orderCommand) {
+	public String checkout(String orderCommand) throws Exception {
 		OrderCommand command = OrderCommand.from(orderCommand);
 		OrderRepresentation result = checkout(command);
 
 		return result.toString();
 	}
 
-	OrderRepresentation checkout(OrderCommand command) {
+	OrderRepresentation checkout(OrderCommand command) throws Exception {
 		OrderRepresentation result = null;
 
 		String orderId = command.getOrderId();
@@ -151,7 +151,7 @@ public class OrderApp {
 
 	// 计算活动金额
 	private List<DiscountItemRepresentation> computeAmount(List<OrderItemCommand> items, List<PaymentCommand> payments,
-			List<String> discounts) {
+			List<String> discounts) throws Exception {
 
 		List<DiscountItemRepresentation> DiscountItemRepresentationList = new ArrayList<DiscountItemRepresentation>();
 
