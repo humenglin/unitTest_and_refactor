@@ -30,4 +30,12 @@ public class Member {
 	public void setMemberPoints(int memberPoints) {
 		this.memberPoints = memberPoints;
 	}
+
+	public String getMemberNo() {
+		return memberNo;
+	}
+
+	public String getMemberName() {
+		return memberName;
+	}
 }
