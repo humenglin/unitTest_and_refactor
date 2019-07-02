@@ -75,7 +75,7 @@ public class OrderApp {
 				payments, discountCards);
 
 		return result;
-	}
+    }
 
 	private Date formatDate(String time) {
 		Date createTime = null;
@@ -95,6 +95,7 @@ public class OrderApp {
 		return payments;
 	}
 
+	//处理规则
 	private List<DiscountItemRepresentation> generateDiscountItemRepresentation() {
 		List<DiscountItemRepresentation> discounts = new ArrayList<DiscountItemRepresentation>();
 
