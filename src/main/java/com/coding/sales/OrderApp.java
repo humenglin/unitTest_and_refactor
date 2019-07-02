@@ -12,10 +12,12 @@ import com.coding.sales.init.Members;
 import com.coding.sales.init.PreciousMetals;
 import com.coding.sales.input.OrderCommand;
 import com.coding.sales.input.OrderItemCommand;
+import com.coding.sales.interfaces.impl.CardCreateFactory;
 import com.coding.sales.output.DiscountItemRepresentation;
 import com.coding.sales.output.OrderItemRepresentation;
 import com.coding.sales.output.OrderRepresentation;
 import com.coding.sales.output.PaymentRepresentation;
+import com.coding.sales.pojo.CardInfo;
 import com.coding.sales.pojo.Member;
 import com.coding.sales.pojo.PreciousMetal;
 
@@ -57,11 +59,12 @@ public class OrderApp {
 		String memberName = member.getMemberName();
 		String oldMemberType = member.getMemberType();
 
-		String newMemberType = "金卡";
 		// 积分计算规则
 		int memberPointsIncreased = 9860;
 		int memberPoints = 19720;
-
+		CardCreateFactory cardCreateFactory = new CardCreateFactory();
+		CardInfo cardInfo = cardCreateFactory.createCard(memberPoints);
+		String newMemberType = cardInfo.getCardName();
 		List<OrderItemRepresentation> orderItems = generateOrderItemRepresentation(command.getItems());
 		BigDecimal totalPrice = new BigDecimal("10624.00");
 		List<DiscountItemRepresentation> discounts = generateDiscountItemRepresentation();
