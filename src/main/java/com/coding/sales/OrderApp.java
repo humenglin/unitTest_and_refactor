@@ -71,7 +71,7 @@ public class OrderApp {
 		member.setCardInfo(memberCardInfoNew);
 		
 		List<OrderItemRepresentation> orderItems = generateOrderItemRepresentation(command.getItems());
-		BigDecimal totalPrice = new BigDecimal("10624.00");
+		BigDecimal totalPrice =totalAmount(orderItems);
 		List<DiscountItemRepresentation> discounts = generateDiscountItemRepresentation();
 		BigDecimal totalDiscountPrice = new BigDecimal("764.00");
 		BigDecimal receivables = new BigDecimal("9860.00");
@@ -132,5 +132,20 @@ public class OrderApp {
 		}
 
 		return orderItems;
+	}
+	/**
+	 * 计算总金额
+	 * 
+	 * @param list
+	 * @return
+	 */
+	private BigDecimal totalAmount(List<OrderItemRepresentation> list) {
+		BigDecimal totalAmount = BigDecimal.ZERO;
+		for (OrderItemRepresentation orderItemRepresentation : list) {
+			totalAmount = orderItemRepresentation.getSubTotal().add(totalAmount);
+		}
+
+		return totalAmount;
+
 	}
 }
