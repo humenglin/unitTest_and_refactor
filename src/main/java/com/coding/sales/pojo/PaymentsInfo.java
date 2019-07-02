@@ -1,6 +1,8 @@
 package com.coding.sales.pojo;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author 商品信息
@@ -16,7 +18,9 @@ public class PaymentsInfo {
  /*价格*/
  private BigDecimal price;
  /*参与活动*/
- private String acticity;
+ private List<String> acticity =new ArrayList<String>();
+ /*代金券*/
+ private String voucher;
  
  
 public String getProduct() {
@@ -44,11 +48,17 @@ public BigDecimal getPrice() {
 public void setPrice(BigDecimal price) {
 	this.price = price;
 }
-public String getActicity() {
+public List<String> getActicity() {
 	return acticity;
 }
-public void setActicity(String acticity) {
+public void setActicity(List<String> acticity) {
 	this.acticity = acticity;
+}
+public String getVoucher() {
+	return voucher;
+}
+public void setVoucher(String voucher) {
+	this.voucher = voucher;
 }
  
 }
