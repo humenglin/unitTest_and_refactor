@@ -57,7 +57,7 @@ public class ActivityRuleImpl implements ActivityRuleInteface {
 					discountOfactivity = discount_activity_3_half;
 				}
 			}
-
+			return discountOfactivity;
 		}
 
 		if (ActicityEnums.activity_3_send_one.toString().equals(activityType)) {
@@ -66,6 +66,7 @@ public class ActivityRuleImpl implements ActivityRuleInteface {
 					discountOfactivity = price;
 				}
 			}
+			return discountOfactivity;
 		}
 		
 		throw new Exception(ExceptionConstans.ACTIVITY_NOT_EXIT);
